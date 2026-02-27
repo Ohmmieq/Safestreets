@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeStreets • Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-container {
+      background: #111111;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      text-align: center;
+    }
+
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #e6b800; /* goldish */
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: #b0b0b0;
+      margin-bottom: 3rem;
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #d0d0d0;
+    }
+
+    input {
+      width: 100%;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.4rem;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: #f5f5f5;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #e6b800;
+      box-shadow: 0 0 0 3px rgba(230, 184, 0, 0.15);
+    }
+
+    .password-group {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 1.4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      cursor: pointer;
+      font-size: 1.3rem;
+      user-select: none;
+    }
+
+    .remember-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 1.5rem 0 2rem;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    .remember-group input {
+      width: 18px;
+      height: 18px;
+      accent-color: #e6b800;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1.2rem;
+      background: #e6b800;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #ffcc00;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(230, 184, 0, 0.3);
+    }
+
+    .otp-section {
+      display: none;
+      margin-top: 2.5rem;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .otp-section.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .otp-boxes {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .otp-box {
+      width: 60px;
+      height: 60px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 10px;
+      font-size: 1.8rem;
+      text-align: center;
+      color: #f5f5f5;
+      font-weight: 700;
+    }
+
+    .otp-box:focus {
+      border-color: #e6b800;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(230, 184, 0, 0.2);
+    }
+
+    .footer-tagline {
+      margin-top: 2.5rem;
+      font-size: 0.95rem;
+      color: #888;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="brand">SafeStreets</div>
+    <div class="tagline">Report Violations Save Lives</div>
+
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter username" required />
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" placeholder="+254 7XX XXX XXX" required />
+
+      <label for="id">ID/Batch Number</label>
+      <input type="text" id="id" placeholder="Enter ID or Batch number" required />
+
+      <label for="password">Password</label>
+      <div class="password-group">
+        <input type="password" id="password" placeholder="Enter password" required />
+        <span class="toggle-password" id="togglePassword">👁</span>
+      </div>
+
+      <div class="remember-group">
+        <input type="checkbox" id="rememberMe" />
+        <label for="rememberMe">Remember me</label>
+      </div>
+
+      <button type="button" class="btn" id="sendOTPBtn">Send OTP</button>
+    </form>
+
+    <div class="otp-section" id="otpSection">
+      <div class="otp-boxes">
+        <input type="text" class="otp-box" maxlength="1" />
+        <input type="text" class="otp-box" maxlength="1" />
+        <input type="text" class="otp-box" maxlength="1" />
+        <input type="text" class="otp-box" maxlength="1" />
+        <input type="text" class="otp-box" maxlength="1" />
+        <input type="text" class="otp-box" maxlength="1" />
+      </div>
+    </div>
+
+    <div class="footer-tagline">Report Violations Save Lives</div>
+  </div>
+
+  <script>
+    // Password toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.textContent = type === 'password' ? '👁' : '🙈';
+    });
+
+    // Show OTP boxes after Send OTP click
+    document.getElementById('sendOTPBtn').addEventListener('click', () => {
+      const otpSection = document.getElementById('otpSection');
+      otpSection.classList.add('show');
+
+      // Optional: auto-focus first OTP box
+      document.querySelector('.otp-box').focus();
+    });
+
+    // Auto-focus next OTP box (optional enhancement)
+    const otpInputs = document.querySelectorAll('.otp-box');
+    otpInputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

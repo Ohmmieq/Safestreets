@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeStreets Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --sidebar: #1e293b;
+      --card: #1e2937;
+      --accent: #3b82f6;
+      --accent-glow: #60a5fa;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --border: #334155;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .layout { display: flex; height: 100vh; }
+
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+    .logo {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--accent-glow);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .nav-item {
+      padding: 14px 20px;
+      margin: 6px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: #334155;
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left { font-size: 1.4rem; font-weight: 600; }
+    .header-right {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .search {
+      background: #334155;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      color: white;
+      width: 340px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.3rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .icon-btn:hover { color: var(--accent-glow); }
+    .badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 50%;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .content {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .kpi-card {
+      background: var(--card);
+      padding: 1.6rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      text-align: center;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .kpi-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(59,130,246,0.15);
+    }
+    .kpi-label { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .kpi-value {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--accent-glow);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .chart-card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .map-wrapper {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      height: 420px;
+      margin-bottom: 2.5rem;
+    }
+    #map { height: 100%; }
+
+    .reports-table {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 14px 1.5rem;
+      text-align: left;
+    }
+    th {
+      background: #1e2937;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    tr:hover {
+      background: #1e2937;
+      cursor: pointer;
+    }
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .status-new    { background:#fef08a; color:#854d0e; }
+    .status-pending { background:#bfdbfe; color:#1e40af; }
+    .status-assigned { background:#6ee7b7; color:#065f46; }
+    .status-resolved { background:#86efac; color:#166534; }
+    .btn-assign {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .online-bubbles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .bubble {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 3px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      position: relative;
+    }
+    .bubble.online::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid var(--card);
+    }
+    .bubble.offline::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 12px;
+      height: 12px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid var(--card);
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <div class="logo">SafeStreets</div>
+    <div class="nav-item active" onclick="switchSection('dashboard')"><i class="fas fa-gauge-high"></i> Dashboard</div>
+    <div class="nav-item" onclick="switchSection('reports')"><i class="fas fa-list"></i> Reports</div>
+    <div class="nav-item" onclick="switchSection('officers')"><i class="fas fa-user-shield"></i> Officers</div>
+    <div class="nav-item" onclick="switchSection('violations')"><i class="fas fa-exclamation-triangle"></i> Violations</div>
+    <div class="nav-item" onclick="switchSection('analytics')"><i class="fas fa-chart-line"></i> Analytics</div>
+    <div class="nav-item" onclick="switchSection('settings')"><i class="fas fa-cog"></i> Settings</div>
+  </div>
+
+  <div class="main">
+
+    <div class="header">
+      <div class="header-left">Admin Dashboard</div>
+      <div class="header-right">
+        <input type="text" class="search" placeholder="Search reports, plates..." id="searchInput" oninput="filterTable()"/>
+        <div class="icon-btn"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+        <div class="avatar">NA</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Dashboard -->
+      <div id="dashboard" class="section active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Reports</div>
+            <div class="kpi-value">1,245</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Pending</div>
+            <div class="kpi-value">342</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Resolved</div>
+            <div class="kpi-value">903</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Most Common</div>
+            <div class="kpi-value">Speeding</div>
+          </div>
+        </div>
+
+        <div style="margin-top:2rem;">
+          <h3 style="margin-bottom:1rem;">Who is Online</h3>
+          <div class="online-bubbles">
+            <div class="bubble online">TO-4567</div>
+            <div class="bubble online">TO-8921</div>
+            <div class="bubble offline">TO-1123</div>
+            <div class="bubble online">TO-3345</div>
+          </div>
+        </div>
+
+        <div class="charts-grid" style="margin-top:2.5rem;">
+          <div class="chart-card">
+            <div class="chart-title">Violations per Region</div>
+            <canvas id="regionChart" height="140"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Violation Types</div>
+            <canvas id="typeChart" height="140"></canvas>
+          </div>
+        </div>
+
+        <div class="map-wrapper">
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <!-- Reports -->
+      <div id="reports" class="section" style="display:none;">
+        <div class="reports-table">
+          <div class="table-header">
+            <h3>All Reported Violations</h3>
+            <div>
+              <select id="statusFilter" onchange="filterTable()">
+                <option value="">All Status</option>
+                <option value="New">New</option>
+                <option value="Pending">Pending</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+              <input type="text" placeholder="Search by plate..." id="plateSearch" oninput="filterTable()" style="padding:8px 12px; margin-left:12px; border-radius:8px; background:#334155; color:white; border:none;"/>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Plate</th>
+                <th>Violation</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Officers -->
+      <div id="officers" class="section" style="display:none;">
+        <h2>Traffic Officers</h2>
+        <div class="online-bubbles" style="margin-top:1.5rem;">
+          <div class="bubble online">TO-4567</div>
+          <div class="bubble online">TO-8921</div>
+          <div class="bubble offline">TO-1123</div>
+          <div class="bubble online">TO-3345</div>
+        </div>
+      </div>
+
+      <!-- Violations & Analytics placeholders -->
+      <div id="violations" class="section" style="display:none;">
+        <h2>Violation Types</h2>
+        <p>Full list coming soon...</p>
+      </div>
+      <div id="analytics" class="section" style="display:none;">
+        <h2>Analytics</h2>
+        <p>Charts and stats coming soon...</p>
+      </div>
+      <div id="settings" class="section" style="display:none;">
+        <h2>Settings</h2>
+        <p>System configuration coming soon...</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Switch sections
+function switchSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.textContent.trim() === document.querySelector(`#${id} h2`)?.textContent.trim() || item.textContent.trim() === 'Dashboard') {
+      item.classList.add('active');
+    }
+  });
+}
+
+// Demo data for reports
+const reports = [
+  { id:124, plate:'KAA 456C', violation:'Speeding 120km/h', location:'Thika Road', date:'2 min ago', status:'Pending' },
+  { id:123, plate:'KBB 789D', violation:'Red light violation', location:'Uhuru Highway', date:'15 min ago', status:'Resolved' },
+  { id:122, plate:'KCC 321E', violation:'Using phone while driving', location:'Ngong Road', date:'32 min ago', status:'Assigned' },
+  { id:121, plate:'KDD 654F', violation:'Reckless driving', location:'Mombasa Road', date:'1 hr ago', status:'New' }
+];
+
+// Render table
+function renderTable(data = reports) {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  data.forEach(r => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${r.id}</td>
+      <td><strong>${r.plate}</strong></td>
+      <td>${r.violation}</td>
+      <td>${r.location}</td>
+      <td>${r.date}</td>
+      <td><span class="status-badge" style="background:#${r.status==='Pending'?'fef08a':r.status==='Assigned'?'6ee7b7':r.status==='Resolved'?'86efac':'#fef08a'};color:#${r.status==='Pending'?'854d0e':r.status==='Assigned'?'065f46':r.status==='Resolved'?'166534':'854d0e'};">${r.status}</span></td>
+      <td><button class="btn-assign" onclick="assignOfficer(${r.id})">Assign Officer</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Filter table
+function filterTable() {
+  const status = document.getElementById('statusFilter')?.value || '';
+  const plate = document.getElementById('plateSearch')?.value.toLowerCase() || '';
+  const filtered = reports.filter(r => {
+    const statusMatch = !status || r.status === status;
+    const plateMatch = !plate || r.plate.toLowerCase().includes(plate);
+    return statusMatch && plateMatch;
+  });
+  renderTable(filtered);
+}
+
+// Assign modal
+function assignOfficer(id) {
+  alert(`Assigning report #${id} to nearest traffic officer (demo)`);
+}
+
+// Initial render
+renderTable();
+
+// Sidebar clicks
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const section = item.textContent.trim().toLowerCase();
+    switchSection(section);
+  });
+});
+</script>
+</body>
+</html>

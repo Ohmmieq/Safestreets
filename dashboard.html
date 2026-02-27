@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>SafeStreets — Live Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { margin:0; font-family: 'Segoe UI', sans-serif; background:#f8fafc; overflow:hidden; }
+    #map { height: 100dvh; width: 100%; }
+    #status {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      font-weight: 600;
+      color: #1e40af;
+      white-space: nowrap;
+      font-size: 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    #status.error {
+      color: #ef4444;
+      background: #fee2e2;
+      border-color: #fecaca;
+    }
+    #retry-btn {
+      margin-left: 12px;
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #retry-btn:hover { background: #2563eb; }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+  <div id="status">Waiting for your location...</div>
+
+  <script>
+    const map = L.map('map', { zoomControl: true, zoomAnimation: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const status = document.getElementById('status');
+    let userMarker = null;
+    let watchId = null;
+
+    function showLocation(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+      const time = new Date().toLocaleTimeString();
+
+      status.innerHTML = `Your location • ${acc.toFixed(0)}m • Updated ${time}`;
+      status.classList.remove('error');
+
+      map.setView([lat, lon], 18, { animate: true });
+
+      if (userMarker) map.removeLayer(userMarker);
+      userMarker = L.circleMarker([lat, lon], {
+        radius: 10,
+        fillColor: '#3b82f6',
+        color: 'white',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(map)
+        .bindPopup(`You are here<br>Accuracy: ${acc.toFixed(0)}m<br>${time}`)
+        .openPopup();
+    }
+
+    function showError(err) {
+      status.innerHTML = `GPS issue: ${err.message} <button id="retry-btn">Retry Now</button>`;
+      status.classList.add('error');
+
+      // Auto-retry every 5 seconds if timed out
+      if (err.code === err.TIMEOUT) {
+        setTimeout(getLocation, 5000);
+      }
+    }
+
+    function getLocation() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+
+      watchId = navigator.geolocation.watchPosition(
+        showLocation,
+        showError,
+        {
+          enableHighAccuracy: true,
+          timeout: 60000,          // 60 seconds — very generous
+          maximumAge: 0
+        }
+      );
+    }
+
+    // Start immediately
+    getLocation();
+
+    // Handle retry button click
+    document.addEventListener('click', e => {
+      if (e.target.id === 'retry-btn') {
+        status.textContent = "Retrying GPS...";
+        status.classList.remove('error');
+        getLocation();
+      }
+    });
+
+    // Keep trying if page stays open
+    setInterval(() => {
+      if (status.classList.contains('error')) {
+        getLocation();
+      }
+    }, 15000); // retry every 15s if stuck
+  </script>
+</body>
+</html>

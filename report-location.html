@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStreets - Report Violation</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-road"></i> SafeStreets
+        </div>
+        <a href="dashboard.html" class="back">Back to Map</a>
+    </header>
+
+    <div class="hero">
+        <h1>Report a Traffic Violation</h1>
+        <p>Your report with photo/video, plate number and exact location helps police respond faster.</p>
+    </div>
+
+    <div class="container">
+        <h2>Select Violation Type</h2>
+        <div class="category-grid">
+            <button class="category-card" data-category="speeding"><i class="fas fa-tachometer-alt"></i><span>Speeding</span></button>
+            <button class="category-card" data-category="reckless"><i class="fas fa-car-crash"></i><span>Reckless Driving</span></button>
+            <button class="category-card" data-category="rage"><i class="fas fa-angry"></i><span>Road Rage</span></button>
+            <button class="category-card" data-category="redlight"><i class="fas fa-traffic-light"></i><span>Red Light Violation</span></button>
+            <button class="category-card" data-category="phone"><i class="fas fa-phone"></i><span>Phone While Driving</span></button>
+            <button class="category-card" data-category="accident"><i class="fas fa-exclamation-triangle"></i><span>Accident / Hazard</span></button>
+        </div>
+
+        <div id="details-form" style="display:none;">
+            <h2>Incident Details & Evidence</h2>
+
+            <label>Vehicle Plate Number (if visible)</label>
+            <input type="text" id="plate" placeholder="e.g. KAA 123B" />
+
+            <label>Description of Incident</label>
+            <textarea id="details" rows="5" placeholder="What happened? Time, direction, speed, behavior, road name..."></textarea>
+
+            <label>Attach Photo or Video (very helpful for police)</label>
+            <p class="camera-info"><i class="fas fa-camera"></i> Tap below to open camera or select file</p>
+            <input type="file" id="media" accept="image/*,video/*" capture="camera" />
+
+            <button id="submitBtn" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Submit Report
+            </button>
+        </div>
+
+        <p id="status">Waiting for your location...</p>
+    </div>
+
+    <footer>
+        <p>© 2026 SafeStreets – For safer Kenyan roads</p>
+    </footer>
+
+    <script>
+        // Category selection
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.getElementById('details-form').style.display = 'block';
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+
+        // Submit
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const status = document.getElementById('status');
+            status.textContent = "Getting your exact location and street name...";
+            status.style.color = "#2563eb";
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+
+                    let address = "Unknown location";
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+                        const data = await res.json();
+                        address = data.display_name || "Unknown location";
+                    } catch(e) {}
+
+                    status.textContent = `Location captured: ${address} — Sending report...`;
+
+                    const formData = new FormData();
+                    formData.append('latitude', lat);
+                    formData.append('longitude', lon);
+                    formData.append('plate', document.getElementById('plate').value);
+                    formData.append('details', document.getElementById('details').value + "\nLocation: " + address);
+                    const mediaFile = document.getElementById('media').files[0];
+                    if (mediaFile) formData.append('media', mediaFile);
+
+                    fetch('save_location.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.status === "success") {
+                            status.innerHTML = "✅ Report submitted successfully!<br>Redirecting to map...";
+                            status.style.color = "#10b981";
+                            setTimeout(() => location.href = "dashboard.html", 2500);
+                        } else {
+                            status.textContent = "Error: " + (res.message || "Unknown");
+                            status.style.color = "#ef4444";
+                        }
+                    })
+                    .catch(() => {
+                        status.textContent = "Network error — check internet or server";
+                        status.style.color = "#ef4444";
+                    });
+                },
+                (err) => {
+                    status.textContent = "GPS error: " + err.message + " — Please allow location access";
+                    status.style.color = "#ef4444";
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        });
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+    const status = document.getElementById('status');
+    status.textContent = "Requesting location...";
+    status.style.color = "#2563eb";
+
+    try {
+        const pos = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0
+            });
+        });
+
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        let address = "Unknown location";
+        try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+            const geoData = await geoRes.json();
+            address = geoData.display_name || "Unknown location";
+        } catch (e) {}
+
+        status.textContent = `Location: ${address} — Sending...`;
+
+        const formData = new FormData();
+        formData.append('latitude', lat);
+        formData.append('longitude', lon);
+        formData.append('plate', document.getElementById('plate').value.trim());
+        formData.append('details', document.getElementById('details').value.trim() + "\nLocation: " + address);
+
+        const media = document.getElementById('media').files[0];
+        if (media) formData.append('media', media);
+
+        const res = await fetch('save_location.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server returned ${res.status} ${res.statusText}`);
+        }
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+            status.innerHTML = "Success! Report sent.<br>Redirecting to map...";
+            status.style.color = "#10b981";
+            setTimeout(() => window.location.href = "dashboard.html", 2500);
+        } else {
+            status.textContent = "Server error: " + (result.message || "Unknown response");
+            status.style.color = "#ef4444";
+        }
+    } catch (err) {
+        status.textContent = "Error: " + err.message;
+        status.style.color = "#ef4444";
+        console.error("Full error:", err);
+    }
+});
+    </script>
+</body>
+</html>

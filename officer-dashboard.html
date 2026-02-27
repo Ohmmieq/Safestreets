@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeStreets — Officer Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #1e2937;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .logo { font-size: 2rem; font-weight: 800; color: #60a5fa; }
+
+    .main {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #1e293b;
+      border-right: 1px solid #334155;
+      padding: 2rem 1rem;
+      overflow-y: auto;
+    }
+    .nav-item {
+      padding: 14px 18px;
+      margin: 6px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+      color: #94a3b8;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: #334155;
+      color: white;
+    }
+
+    .content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #60a5fa;
+    }
+
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .case-card {
+      background: #1e2937;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid #334155;
+    }
+    .case-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .case-plate {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .btn-update {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .online-bubbles {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .bubble {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      position: relative;
+    }
+    .bubble.online::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">SafeStreets</div>
+    <div>Officer Dashboard</div>
+  </div>
+
+  <div class="main">
+
+    <div class="sidebar">
+      <div class="nav-item active">My Assigned Cases</div>
+      <div class="nav-item">My Reports</div>
+      <div class="nav-item">Profile</div>
+      <div class="nav-item">Logout</div>
+    </div>
+
+    <div class="content">
+      <h2 class="section-title">My Assigned Cases</h2>
+      <div class="cases-grid">
+        <div class="case-card">
+          <div class="case-header">
+            <div class="case-plate">KAA 456C</div>
+            <span class="status-badge" style="background:#fef08a;color:#854d0e;">Pending</span>
+          </div>
+          <p>Speeding 120km/h on Thika Road</p>
+          <p style="color:#94a3b8;margin-top:0.5rem;">Reported 2 min ago</p>
+          <button class="btn-update">Mark Resolved</button>
+        </div>
+
+        <div class="case-card">
+          <div class="case-header">
+            <div class="case-plate">KBB 789D</div>
+            <span class="status-badge" style="background:#86efac;color:#166534;">Resolved</span>
+          </div>
+          <p>Red light violation on Uhuru Highway</p>
+          <p style="color:#94a3b8;margin-top:0.5rem;">Reported 15 min ago</p>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="margin-top:3rem;">Who is Online</h2>
+      <div class="online-bubbles">
+        <div class="bubble online">TO-4567</div>
+        <div class="bubble online">TO-8921</div>
+        <div class="bubble offline">TO-1123</div>
+        <div class="bubble online">TO-3345</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

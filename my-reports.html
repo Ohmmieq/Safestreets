@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeStreets — My Reports</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #0f172a;
+      font-family: 'Inter', sans-serif;
+      color: #e2e8f0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 2.5rem; margin-bottom: 2rem; }
+
+    .report-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .status-pending { color: #fbbf24; }
+    .status-reviewed { color: #22c55e; }
+    .status-rejected { color: #ef4444; }
+
+    .report-details {
+      font-size: 1rem;
+      color: #94a3b8;
+    }
+
+    .report-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .no-reports { text-align: center; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>My Reports</h1>
+
+    <!-- Demo Reports - Replace with backend fetch -->
+    <div class="report-card">
+      <div class="report-header">
+        <span>Report #001 - Speeding</span>
+        <span class="status-pending">Pending</span>
+      </div>
+      <div class="report-details">
+        Date: Feb 18, 2026<br>
+        Location: Nairobi-Thika Highway<br>
+        Description: Vehicle KAA123Z speeding at 120km/h in 80km/h zone.
+      </div>
+      <img src="https://picsum.photos/400/200?random=1" alt="Report Image" class="report-img">
+    </div>
+
+    <div class="report-card">
+      <div class="report-header">
+        <span>Report #002 - Phone Use</span>
+        <span class="status-reviewed">Reviewed</span>
+      </div>
+      <div class="report-details">
+        Date: Feb 15, 2026<br>
+        Location: Mombasa Road<br>
+        Description: Driver using phone while driving.
+      </div>
+      <img src="https://picsum.photos/400/200?random=2" alt="Report Image" class="report-img">
+    </div>
+
+    <!-- If no reports -->
+    <!-- <p class="no-reports">No reports submitted yet.</p> -->
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SafeStreets Web</title>
+  <link rel="stylesheet" href="style.css"> <!-- no trailing slash -->
+</head>
+<body>
+  <div id="page-debug" style="color:red; font-weight:bold; padding:8px;"></div>
+  <h1>Welcome to SafeStreets</h1>
+  <a href="report.html">Send Location</a>
+  <a href="dashboard.html">Go to Dashboard with Maps</a>
+
+  <script>
+    window.addEventListener('error', function(e) {
+      const el = document.getElementById('page-debug');
+      el && (el.textContent = 'JS Error: ' + (e.message || e.error || 'unknown'));
+      console.error('Captured error:', e);
+    });
+    window.addEventListener('unhandledrejection', function(ev) {
+      const el = document.getElementById('page-debug');
+      el && (el.textContent = 'Promise rejection: ' + (ev.reason && (ev.reason.message || ev.reason) || 'unknown'));
+      console.error('Unhandled rejection:', ev);
+    });
+  </script>
+</body>
+</html>
